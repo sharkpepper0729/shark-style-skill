@@ -1,0 +1,1191 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shark-Style UI Design System</title>
+<style>
+  /* ── Reset ── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  /* ── Design Tokens ── */
+  :root {
+    --color-blue:        #007AFF;
+    --color-green:       #34C759;
+    --color-red:         #FF3B30;
+    --color-orange:      #FF9500;
+    --color-yellow:      #FFCC00;
+    --color-pink:        #FF2D55;
+    --color-purple:      #AF52DE;
+    --color-teal:        #5AC8FA;
+    --color-indigo:      #5856D6;
+    --gray-1: #8E8E93;
+    --gray-2: #AEAEB2;
+    --gray-3: #C7C7CC;
+    --gray-4: #D1D1D6;
+    --gray-5: #E5E5EA;
+    --gray-6: #F2F2F7;
+    --label:            #1D1D1F;
+    --secondary-label:  rgba(60, 60, 67, 0.60);
+    --tertiary-label:   rgba(60, 60, 67, 0.30);
+    --placeholder-text: rgba(60, 60, 67, 0.30);
+    --bg-primary:   #FFFFFF;
+    --bg-secondary: #F2F2F7;
+    --bg-alt:       #F5F5F7;
+    --separator:        rgba(60, 60, 67, 0.29);
+    --opaque-separator: #C6C6C8;
+    --color-action:        #0071E3;
+    --color-action-hover:  #0077ED;
+    --color-action-active: #006EDB;
+    --fill:           rgba(120, 120, 128, 0.20);
+    --secondary-fill: rgba(120, 120, 128, 0.16);
+    --tertiary-fill:  rgba(118, 118, 128, 0.12);
+    --font-sans: "SF Pro Display", "SF Pro Text", -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    --font-mono: "SF Mono", "Menlo", "Monaco", "Courier New", monospace;
+    --space-1: 4px;  --space-2: 8px;   --space-3: 12px;  --space-4: 16px;
+    --space-5: 20px; --space-6: 24px;  --space-8: 32px;  --space-10: 40px;
+    --space-12: 48px; --space-16: 64px;
+    --radius-xs: 4px; --radius-sm: 8px; --radius-md: 10px; --radius-lg: 12px;
+    --radius-xl: 16px; --radius-2xl: 20px; --radius-full: 9999px;
+    --shadow-0: none;
+    --shadow-1: 0 1px 2px rgba(0,0,0,.12), 0 1px 1px rgba(0,0,0,.08);
+    --shadow-2: 0 2px 8px rgba(0,0,0,.12), 0 1px 3px rgba(0,0,0,.08);
+    --shadow-3: 0 4px 16px rgba(0,0,0,.12), 0 2px 6px rgba(0,0,0,.08);
+    --shadow-4: 0 8px 32px rgba(0,0,0,.16), 0 4px 12px rgba(0,0,0,.08);
+    --shadow-5: 0 16px 48px rgba(0,0,0,.20), 0 8px 16px rgba(0,0,0,.10);
+    --duration-fast: 150ms; --duration-standard: 250ms;
+    --duration-medium: 350ms; --duration-slow: 500ms;
+    --ease-default: cubic-bezier(0.42, 0.00, 0.58, 1.00);
+    --ease-enter:   cubic-bezier(0.00, 0.00, 0.20, 1.00);
+    --ease-exit:    cubic-bezier(0.40, 0.00, 1.00, 1.00);
+    --ease-spring:  cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+
+  /* ── Base ── */
+  body {
+    font-family: var(--font-sans);
+    font-size: 15px;
+    color: var(--label);
+    background: #EAEAEC;
+    line-height: 1.5;
+    padding: 40px 32px;
+  }
+
+  /* ── Page Header ── */
+  .page-header {
+    margin-bottom: 48px;
+    border-bottom: 0.5px solid var(--opaque-separator);
+    padding-bottom: 24px;
+  }
+  .page-header h1 { font-size: 34px; font-weight: 700; letter-spacing: -0.5px; }
+  .page-header p  { font-size: 17px; color: var(--secondary-label); margin-top: 6px; }
+
+  /* ── Section ── */
+  .section { margin-bottom: 56px; }
+  .section-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.08em;
+    text-transform: uppercase; color: var(--secondary-label);
+    margin-bottom: 16px; padding-bottom: 8px;
+    border-bottom: 0.5px solid var(--opaque-separator);
+  }
+  .spec-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 16px;
+  }
+  .spec-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: 20px;
+    box-shadow: var(--shadow-1);
+  }
+  .spec-card-title {
+    font-size: 11px; font-weight: 600; letter-spacing: 0.06em;
+    text-transform: uppercase; color: var(--secondary-label);
+    margin-bottom: 16px;
+  }
+  .spec-row {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 6px 0; border-bottom: 0.5px solid var(--separator);
+    font-size: 13px;
+  }
+  .spec-row:last-child { border-bottom: none; }
+  .spec-label { color: var(--secondary-label); }
+  .spec-value { font-family: var(--font-mono); font-size: 12px; color: var(--label); }
+
+  /* ── Color Swatches ── */
+  .color-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 10px;
+  }
+  .color-swatch {
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-1);
+  }
+  .swatch-preview {
+    height: 52px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 600; color: rgba(255,255,255,0.9);
+    letter-spacing: 0.04em;
+  }
+  .swatch-meta {
+    background: var(--bg-primary);
+    padding: 8px 10px;
+  }
+  .swatch-name { font-size: 12px; font-weight: 600; color: var(--label); }
+  .swatch-hex  { font-size: 11px; font-family: var(--font-mono); color: var(--secondary-label); margin-top: 2px; }
+
+  .gray-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+  }
+  .gray-swatch {
+    border-radius: var(--radius-sm);
+    overflow: hidden;
+    box-shadow: var(--shadow-1);
+  }
+  .gray-preview {
+    height: 40px;
+    border-bottom: 0.5px solid var(--separator);
+  }
+  .gray-meta { padding: 6px 8px; background: var(--bg-primary); }
+  .gray-label { font-size: 11px; font-weight: 600; color: var(--label); }
+  .gray-value { font-size: 10px; font-family: var(--font-mono); color: var(--secondary-label); }
+
+  /* ── Type Scale ── */
+  .type-item { padding: 10px 0; border-bottom: 0.5px solid var(--separator); display: flex; align-items: baseline; gap: 16px; }
+  .type-item:last-child { border-bottom: none; }
+  .type-meta { width: 220px; flex-shrink: 0; }
+  .type-meta-name { font-size: 11px; font-weight: 600; color: var(--secondary-label); text-transform: uppercase; letter-spacing: 0.06em; }
+  .type-meta-spec { font-size: 11px; font-family: var(--font-mono); color: var(--tertiary-label); margin-top: 2px; }
+  .type-sample { color: var(--label); }
+
+  /* ── Spacing ── */
+  .spacing-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .spacing-bar { background: var(--color-action); border-radius: 2px; height: 16px; min-width: 4px; }
+  .spacing-info { font-size: 13px; }
+  .spacing-token { font-family: var(--font-mono); color: var(--label); }
+  .spacing-px { color: var(--secondary-label); margin-left: 6px; }
+
+  /* ── Radius ── */
+  .radius-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+  .radius-item { text-align: center; }
+  .radius-box {
+    width: 60px; height: 60px;
+    background: var(--color-action);
+    opacity: 0.15;
+    border: 2px solid var(--color-action);
+    margin-bottom: 6px;
+  }
+  .radius-label { font-size: 11px; font-family: var(--font-mono); color: var(--secondary-label); }
+  .radius-val { font-size: 11px; color: var(--label); font-weight: 600; }
+
+  /* ── Shadow ── */
+  .shadow-grid { display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; }
+  .shadow-item { text-align: center; }
+  .shadow-box {
+    width: 72px; height: 72px;
+    background: var(--bg-primary);
+    border-radius: var(--radius-md);
+    margin-bottom: 8px;
+  }
+  .shadow-label { font-size: 11px; font-family: var(--font-mono); color: var(--secondary-label); }
+
+  /* ── Buttons ── */
+  .btn-showcase { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    border: none; cursor: pointer; font-family: var(--font-sans);
+    transition: filter var(--duration-fast) var(--ease-default), transform var(--duration-fast) var(--ease-default);
+    white-space: nowrap;
+  }
+  .btn:hover { filter: brightness(1.06); }
+  .btn:active { filter: brightness(0.94); transform: scale(0.98); }
+
+  .btn-primary { background: var(--color-action); color: #FFF; height: 50px; padding: 0 24px; border-radius: var(--radius-full); font-size: 17px; font-weight: 600; box-shadow: var(--shadow-1); }
+  .btn-secondary { background: rgba(0,113,227,.1); color: var(--color-action); height: 34px; padding: 0 18px; border-radius: var(--radius-full); font-size: 15px; font-weight: 600; }
+  .btn-tertiary { background: var(--gray-5); color: var(--label); height: 34px; padding: 0 18px; border-radius: var(--radius-full); font-size: 15px; font-weight: 600; }
+  .btn-ghost { background: transparent; color: var(--color-action); height: 34px; padding: 0 18px; border-radius: var(--radius-full); font-size: 15px; font-weight: 400; }
+  .btn-danger { background: var(--color-red); color: #FFF; height: 50px; padding: 0 24px; border-radius: var(--radius-full); font-size: 17px; font-weight: 600; box-shadow: var(--shadow-1); }
+  .btn-disabled { background: var(--color-action); color: #FFF; height: 34px; padding: 0 18px; border-radius: var(--radius-full); font-size: 15px; font-weight: 600; opacity: 0.38; cursor: not-allowed; }
+
+  /* ── Inputs ── */
+  .input-showcase { display: flex; flex-direction: column; gap: 12px; }
+  .input-field {
+    height: 44px; width: 100%;
+    border: 1px solid var(--gray-3);
+    border-radius: var(--radius-md);
+    background: var(--bg-primary);
+    font-family: var(--font-sans); font-size: 17px; color: var(--label);
+    padding: 0 12px;
+    outline: none;
+    transition: border-color var(--duration-fast) var(--ease-default),
+                box-shadow var(--duration-fast) var(--ease-default);
+  }
+  .input-field:focus { border: 2px solid var(--color-action); box-shadow: 0 0 0 3px rgba(0,113,227,.12); }
+  .input-field::placeholder { color: var(--placeholder-text); }
+  .input-field.error { border-color: var(--color-red); }
+  .input-field.error:focus { box-shadow: 0 0 0 3px rgba(255,59,48,.12); }
+
+  .search-field-wrap { position: relative; }
+  .search-field {
+    height: 36px; width: 100%;
+    border: none; border-radius: var(--radius-full);
+    background: var(--tertiary-fill);
+    font-family: var(--font-sans); font-size: 15px; color: var(--label);
+    padding: 0 32px;
+    outline: none;
+    transition: box-shadow var(--duration-fast) var(--ease-default);
+  }
+  .search-field:focus { box-shadow: 0 0 0 2px var(--color-action); }
+  .search-field::placeholder { color: var(--placeholder-text); }
+  .search-icon { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-1); font-size: 14px; pointer-events: none; }
+  .search-clear { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); color: var(--gray-1); font-size: 13px; cursor: pointer; background: var(--gray-3); border: none; border-radius: 50%; width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-family: var(--font-sans); }
+
+  /* ── Toggle ── */
+  .toggle-showcase { display: flex; flex-direction: column; gap: 14px; }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+  .toggle-label-text { font-size: 17px; color: var(--label); }
+  .toggle {
+    position: relative; width: 51px; height: 31px;
+    cursor: pointer; flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute; inset: 0;
+    background: var(--gray-3);
+    border-radius: var(--radius-full);
+    transition: background 0.3s var(--ease-spring);
+  }
+  .toggle input:checked + .toggle-track { background: var(--color-green); }
+  .toggle-thumb {
+    position: absolute; top: 2px; left: 2px;
+    width: 27px; height: 27px;
+    background: #FFF;
+    border-radius: 50%;
+    box-shadow: 0 2px 4px rgba(0,0,0,.2);
+    transition: transform 0.3s var(--ease-spring);
+  }
+  .toggle input:checked ~ .toggle-thumb { transform: translateX(20px); }
+
+  /* ── Checkbox ── */
+  .checkbox-row { display: flex; align-items: center; gap: 10px; cursor: pointer; }
+  .checkbox-box {
+    width: 20px; height: 20px; border-radius: var(--radius-xs);
+    border: 1.5px solid var(--gray-3); background: var(--bg-primary);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all var(--duration-fast) var(--ease-default);
+  }
+  .checkbox-box.checked { background: var(--color-action); border-color: var(--color-action); }
+  .checkbox-check { color: white; font-size: 12px; font-weight: 700; display: none; }
+  .checkbox-box.checked .checkbox-check { display: block; }
+  .checkbox-text { font-size: 17px; color: var(--label); }
+
+  /* ── Segmented Control ── */
+  .segmented {
+    display: inline-flex; height: 32px;
+    background: var(--tertiary-fill);
+    border-radius: var(--radius-sm);
+    padding: 2px;
+    gap: 2px;
+  }
+  .seg-btn {
+    padding: 0 14px; border-radius: 6px; border: none;
+    background: transparent; color: var(--secondary-label);
+    font-family: var(--font-sans); font-size: 13px; font-weight: 600;
+    cursor: pointer; transition: all var(--duration-fast) var(--ease-default);
+    white-space: nowrap;
+  }
+  .seg-btn.active {
+    background: var(--bg-primary); color: var(--label);
+    box-shadow: var(--shadow-1);
+  }
+
+  /* ── Alert Banners ── */
+  .alert-showcase { display: flex; flex-direction: column; gap: 10px; }
+  .alert {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 16px;
+    border-radius: var(--radius-md);
+    border-left: 3px solid;
+  }
+  .alert-info    { background: rgba(0,122,255,.06);   border-left-color: #007AFF; }
+  .alert-success { background: rgba(52,199,89,.06);   border-left-color: #34C759; }
+  .alert-warning { background: rgba(255,149,0,.06);   border-left-color: #FF9500; }
+  .alert-error   { background: rgba(255,59,48,.06);   border-left-color: #FF3B30; }
+  .alert-icon { font-size: 16px; margin-top: 1px; flex-shrink: 0; }
+  .alert-info    .alert-icon { color: #007AFF; }
+  .alert-success .alert-icon { color: #34C759; }
+  .alert-warning .alert-icon { color: #FF9500; }
+  .alert-error   .alert-icon { color: #FF3B30; }
+  .alert-title { font-size: 15px; font-weight: 600; color: var(--label); }
+  .alert-body  { font-size: 13px; color: var(--secondary-label); margin-top: 2px; line-height: 1.4; }
+
+  /* ── Badges ── */
+  .badge-showcase { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+  .badge {
+    display: inline-flex; align-items: center;
+    padding: 3px 8px;
+    border-radius: var(--radius-full);
+    font-size: 12px; font-weight: 700; color: #FFF;
+    white-space: nowrap;
+  }
+  .badge-blue   { background: #007AFF; }
+  .badge-green  { background: #34C759; }
+  .badge-red    { background: #FF3B30; }
+  .badge-orange { background: #FF9500; }
+  .badge-gray   { background: #8E8E93; }
+  .badge-outline {
+    background: transparent;
+    border: 1.5px solid var(--gray-3);
+    color: var(--secondary-label);
+    font-weight: 600;
+  }
+  .badge-dot {
+    padding: 0; width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  /* ── Cards ── */
+  .card-showcase { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    padding: 16px;
+    box-shadow: var(--shadow-1);
+    transition: box-shadow var(--duration-standard) var(--ease-default);
+  }
+  .card:hover { box-shadow: var(--shadow-2); }
+  .card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .card-title { font-size: 17px; font-weight: 600; color: var(--label); }
+  .card-subtitle { font-size: 13px; color: var(--secondary-label); margin-top: 2px; }
+  .card-body { font-size: 15px; color: var(--secondary-label); line-height: 1.5; }
+  .card-stat { font-size: 34px; font-weight: 700; color: var(--label); line-height: 1; }
+  .card-stat-label { font-size: 13px; color: var(--secondary-label); margin-top: 4px; }
+  .card-trend { font-size: 13px; font-weight: 600; margin-top: 6px; }
+  .trend-up { color: #34C759; }
+  .trend-down { color: #FF3B30; }
+
+  /* ── Modal ── */
+  .modal-showcase { position: relative; }
+  .modal-preview {
+    background: var(--bg-primary);
+    border-radius: var(--radius-xl);
+    padding: 24px;
+    box-shadow: var(--shadow-4);
+    max-width: 400px;
+  }
+  .modal-title { font-size: 17px; font-weight: 600; text-align: center; }
+  .modal-subtitle { font-size: 13px; color: var(--secondary-label); text-align: center; margin-top: 4px; }
+  .modal-content { margin: 16px 0; background: var(--bg-secondary); border-radius: var(--radius-md); height: 80px; display: flex; align-items: center; justify-content: center; color: var(--tertiary-label); font-size: 13px; }
+  .modal-actions { display: flex; gap: 8px; margin-top: 16px; }
+  .modal-actions .btn-primary { flex: 1; height: 44px; font-size: 15px; }
+  .modal-actions .btn-secondary { flex: 1; height: 44px; font-size: 15px; }
+
+  /* ── List ── */
+  .list-card {
+    background: var(--bg-primary);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    box-shadow: var(--shadow-1);
+  }
+  .list-header {
+    padding: 8px 16px 4px;
+    font-size: 13px; font-weight: 400;
+    color: var(--secondary-label);
+    text-transform: uppercase; letter-spacing: 0.06em;
+  }
+  .list-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px; min-height: 44px;
+    border-bottom: 0.5px solid var(--separator);
+    cursor: pointer; transition: background var(--duration-fast) var(--ease-default);
+  }
+  .list-item:last-child { border-bottom: none; }
+  .list-item:hover { background: var(--bg-secondary); }
+  .list-item.selected { background: var(--gray-5); }
+  .list-item-left { display: flex; align-items: center; gap: 10px; }
+  .list-check { color: var(--color-action); font-size: 14px; width: 16px; }
+  .list-item-text { font-size: 17px; color: var(--label); }
+  .list-item-right { display: flex; align-items: center; gap: 8px; color: var(--secondary-label); font-size: 13px; }
+  .list-chevron { color: var(--gray-3); font-size: 12px; }
+  .list-kbd {
+    font-family: var(--font-mono); font-size: 11px;
+    color: var(--secondary-label); background: var(--gray-5);
+    border-radius: 4px; padding: 2px 5px;
+  }
+
+  /* ── Navbar ── */
+  .navbar-preview {
+    background: rgba(255,255,255,0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    border-radius: var(--radius-lg);
+    border: 0.5px solid var(--opaque-separator);
+    height: 44px;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 16px;
+    box-shadow: var(--shadow-1);
+  }
+  .navbar-left { display: flex; align-items: center; gap: 16px; }
+  .navbar-title { font-size: 17px; font-weight: 600; color: var(--label); }
+  .navbar-back { color: var(--color-action); font-size: 17px; display: flex; align-items: center; gap: 4px; }
+  .navbar-right { display: flex; align-items: center; gap: 12px; }
+  .navbar-action { color: var(--color-action); font-size: 17px; background: none; border: none; cursor: pointer; font-family: var(--font-sans); }
+
+  /* ── Breadcrumb ── */
+  .breadcrumb { display: flex; align-items: center; gap: 4px; }
+  .breadcrumb-item { font-size: 13px; color: var(--secondary-label); cursor: pointer; }
+  .breadcrumb-item:hover { color: var(--color-action); }
+  .breadcrumb-item.active { color: var(--label); cursor: default; font-weight: 500; }
+  .breadcrumb-sep { color: var(--gray-2); font-size: 11px; }
+
+  /* ── Avatar ── */
+  .avatar-showcase { display: flex; gap: 16px; align-items: center; }
+  .avatar {
+    border-radius: 50%; display: flex; align-items: center; justify-content: center;
+    font-weight: 600; color: #FFF; flex-shrink: 0;
+    background: var(--color-blue); font-family: var(--font-sans);
+  }
+  .avatar-sm  { width: 28px; height: 28px; font-size: 11px; }
+  .avatar-md  { width: 36px; height: 36px; font-size: 14px; }
+  .avatar-lg  { width: 48px; height: 48px; font-size: 18px; }
+  .avatar-xl  { width: 64px; height: 64px; font-size: 24px; }
+  .avatar-gray { background: var(--gray-3); color: var(--secondary-label); }
+  .avatar-group { display: flex; }
+  .avatar-group .avatar { border: 2px solid var(--bg-primary); margin-left: -8px; }
+  .avatar-group .avatar:first-child { margin-left: 0; }
+
+  /* ── Animation tokens display ── */
+  .anim-item { display: flex; align-items: center; gap: 12px; margin-bottom: 10px; }
+  .anim-bar {
+    height: 6px; border-radius: 3px; background: var(--color-action);
+    animation: none;
+  }
+  .anim-label { font-size: 13px; font-family: var(--font-mono); color: var(--label); min-width: 180px; }
+  .anim-desc { font-size: 13px; color: var(--secondary-label); }
+
+  /* ── Motion Demo ── */
+  .motion-demo { display: flex; gap: 16px; flex-wrap: wrap; }
+  .motion-box {
+    width: 48px; height: 48px; border-radius: var(--radius-md);
+    background: var(--color-action); opacity: 0.8; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: white; font-size: 11px; font-weight: 600; text-align: center;
+    line-height: 1.2;
+  }
+  .motion-box:hover { transform: scale(1.08); }
+  .motion-standard { transition: transform var(--duration-standard) var(--ease-default); }
+  .motion-spring   { transition: transform var(--duration-medium)   var(--ease-spring); }
+  .motion-enter    { transition: transform var(--duration-medium)   var(--ease-enter); }
+
+  /* ── Token reference table ── */
+  .token-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .token-table th {
+    text-align: left; padding: 8px 12px;
+    background: var(--bg-secondary); color: var(--secondary-label);
+    font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.06em;
+    border-bottom: 0.5px solid var(--opaque-separator);
+  }
+  .token-table td { padding: 8px 12px; border-bottom: 0.5px solid var(--separator); vertical-align: middle; }
+  .token-table tr:last-child td { border-bottom: none; }
+  .token-table tr:hover td { background: var(--bg-secondary); }
+  .token-name { font-family: var(--font-mono); font-size: 12px; color: var(--label); }
+  .token-val  { font-family: var(--font-mono); font-size: 12px; color: var(--secondary-label); }
+  .token-preview-color { width: 20px; height: 20px; border-radius: var(--radius-xs); border: 0.5px solid var(--separator); }
+  .token-preview-radius { width: 28px; height: 28px; background: var(--color-action); opacity: 0.6; }
+  .token-preview-shadow { width: 28px; height: 28px; background: var(--bg-primary); border-radius: var(--radius-sm); }
+</style>
+</head>
+<body>
+
+<!-- ── Page Header ── -->
+<div class="page-header">
+  <h1>Shark-Style Design System</h1>
+  <p>Web Admin · Visual Specification · v1.0 · 2026</p>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     1. COLORS
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">01 — Color System</div>
+
+  <div class="spec-card" style="margin-bottom:16px;">
+    <div class="spec-card-title">System Colors</div>
+    <div class="color-grid">
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#007AFF;">Blue</div>
+        <div class="swatch-meta"><div class="swatch-name">Blue</div><div class="swatch-hex">#007AFF · #0A84FF</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#34C759;">Green</div>
+        <div class="swatch-meta"><div class="swatch-name">Green</div><div class="swatch-hex">#34C759 · #30D158</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#FF3B30;">Red</div>
+        <div class="swatch-meta"><div class="swatch-name">Red</div><div class="swatch-hex">#FF3B30 · #FF453A</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#FF9500;">Orange</div>
+        <div class="swatch-meta"><div class="swatch-name">Orange</div><div class="swatch-hex">#FF9500 · #FF9F0A</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#FFCC00; color:rgba(0,0,0,0.6);">Yellow</div>
+        <div class="swatch-meta"><div class="swatch-name">Yellow</div><div class="swatch-hex">#FFCC00 · #FFD60A</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#FF2D55;">Pink</div>
+        <div class="swatch-meta"><div class="swatch-name">Pink</div><div class="swatch-hex">#FF2D55 · #FF375F</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#AF52DE;">Purple</div>
+        <div class="swatch-meta"><div class="swatch-name">Purple</div><div class="swatch-hex">#AF52DE · #BF5AF2</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#5AC8FA;">Teal</div>
+        <div class="swatch-meta"><div class="swatch-name">Teal</div><div class="swatch-hex">#5AC8FA · #64D2FF</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#5856D6;">Indigo</div>
+        <div class="swatch-meta"><div class="swatch-name">Indigo</div><div class="swatch-hex">#5856D6 · #5E5CE6</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card" style="margin-bottom:16px;">
+    <div class="spec-card-title">Web Action Blue</div>
+    <div class="color-grid">
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#0071E3;">Default</div>
+        <div class="swatch-meta"><div class="swatch-name">Action</div><div class="swatch-hex">#0071E3</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#0077ED;">Hover</div>
+        <div class="swatch-meta"><div class="swatch-name">Hover</div><div class="swatch-hex">#0077ED</div></div>
+      </div>
+      <div class="color-swatch">
+        <div class="swatch-preview" style="background:#006EDB;">Active</div>
+        <div class="swatch-meta"><div class="swatch-name">Active</div><div class="swatch-hex">#006EDB</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="spec-card">
+    <div class="spec-card-title">Gray Scale (Light Mode)</div>
+    <div class="gray-grid">
+      <div class="gray-swatch">
+        <div class="gray-preview" style="background:#8E8E93;"></div>
+        <div class="gray-meta"><div class="gray-label">Gray 1</div><div class="gray-value">#8E8E93</div></div>
+      </div>
+      <div class="gray-swatch">
+        <div class="gray-preview" style="background:#AEAEB2;"></div>
+        <div class="gray-meta"><div class="gray-label">Gray 2</div><div class="gray-value">#AEAEB2</div></div>
+      </div>
+      <div class="gray-swatch">
+        <div class="gray-preview" style="background:#C7C7CC;"></div>
+        <div class="gray-meta"><div class="gray-label">Gray 3</div><div class="gray-value">#C7C7CC</div></div>
+      </div>
+      <div class="gray-swatch">
+        <div class="gray-preview" style="background:#D1D1D6;"></div>
+        <div class="gray-meta"><div class="gray-label">Gray 4</div><div class="gray-value">#D1D1D6</div></div>
+      </div>
+      <div class="gray-swatch">
+        <div class="gray-preview" style="background:#E5E5EA;"></div>
+        <div class="gray-meta"><div class="gray-label">Gray 5</div><div class="gray-value">#E5E5EA</div></div>
+      </div>
+      <div class="gray-swatch">
+        <div class="gray-preview" style="background:#F2F2F7;"></div>
+        <div class="gray-meta"><div class="gray-label">Gray 6</div><div class="gray-value">#F2F2F7</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     2. TYPOGRAPHY
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">02 — Typography</div>
+  <div class="spec-card">
+    <div class="spec-card-title">Type Scale — SF Pro / -apple-system</div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Large Title</div><div class="type-meta-spec">34px / lh 41px / wt 400</div></div>
+      <div class="type-sample" style="font-size:34px;line-height:41px;font-weight:400;">Administration</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Title 1</div><div class="type-meta-spec">28px / lh 34px / wt 400</div></div>
+      <div class="type-sample" style="font-size:28px;line-height:34px;font-weight:400;">Dashboard</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Title 2</div><div class="type-meta-spec">22px / lh 28px / wt 400</div></div>
+      <div class="type-sample" style="font-size:22px;line-height:28px;font-weight:400;">User Management</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Title 3</div><div class="type-meta-spec">20px / lh 25px / wt 400</div></div>
+      <div class="type-sample" style="font-size:20px;line-height:25px;font-weight:400;">Recent Activity</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Headline</div><div class="type-meta-spec">17px / lh 22px / wt 600</div></div>
+      <div class="type-sample" style="font-size:17px;line-height:22px;font-weight:600;">Navigation Title</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Body</div><div class="type-meta-spec">17px / lh 22px / wt 400</div></div>
+      <div class="type-sample" style="font-size:17px;line-height:22px;font-weight:400;">This is body text used for main content areas and descriptions.</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Callout</div><div class="type-meta-spec">16px / lh 21px / wt 400</div></div>
+      <div class="type-sample" style="font-size:16px;line-height:21px;font-weight:400;">Callout text for secondary info</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Subheadline</div><div class="type-meta-spec">15px / lh 20px / wt 400</div></div>
+      <div class="type-sample" style="font-size:15px;line-height:20px;font-weight:400;">Subheadline for secondary content</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Footnote</div><div class="type-meta-spec">13px / lh 18px / wt 400</div></div>
+      <div class="type-sample" style="font-size:13px;line-height:18px;font-weight:400;">Footnote text, helper text, and descriptions</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Caption 1</div><div class="type-meta-spec">12px / lh 16px / wt 400</div></div>
+      <div class="type-sample" style="font-size:12px;line-height:16px;font-weight:400;">Labels, captions, metadata</div>
+    </div>
+    <div class="type-item">
+      <div class="type-meta"><div class="type-meta-name">Caption 2</div><div class="type-meta-spec">11px / lh 13px / wt 400</div></div>
+      <div class="type-sample" style="font-size:11px;line-height:13px;font-weight:400;color:var(--secondary-label);">Smallest labels and annotations</div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     3. SPACING + RADIUS + SHADOW
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">03 — Spacing · Radius · Shadow</div>
+  <div class="spec-grid">
+    <!-- Spacing -->
+    <div class="spec-card">
+      <div class="spec-card-title">Spacing Scale (8px grid)</div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:4px;"></div><div class="spacing-info"><span class="spacing-token">--space-1</span><span class="spacing-px">4px — XS</span></div></div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:8px;"></div><div class="spacing-info"><span class="spacing-token">--space-2</span><span class="spacing-px">8px — S</span></div></div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:12px;"></div><div class="spacing-info"><span class="spacing-token">--space-3</span><span class="spacing-px">12px — S+</span></div></div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:16px;"></div><div class="spacing-info"><span class="spacing-token">--space-4</span><span class="spacing-px">16px — M (default)</span></div></div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:20px;"></div><div class="spacing-info"><span class="spacing-token">--space-5</span><span class="spacing-px">20px — M+</span></div></div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:24px;"></div><div class="spacing-info"><span class="spacing-token">--space-6</span><span class="spacing-px">24px — L</span></div></div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:32px;"></div><div class="spacing-info"><span class="spacing-token">--space-8</span><span class="spacing-px">32px — XL</span></div></div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:48px;"></div><div class="spacing-info"><span class="spacing-token">--space-12</span><span class="spacing-px">48px — 2XL</span></div></div>
+      <div class="spacing-item"><div class="spacing-bar" style="width:64px;"></div><div class="spacing-info"><span class="spacing-token">--space-16</span><span class="spacing-px">64px — 3XL</span></div></div>
+    </div>
+
+    <!-- Border Radius -->
+    <div class="spec-card">
+      <div class="spec-card-title">Border Radius</div>
+      <div class="radius-grid">
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:4px;"></div>
+          <div class="radius-label">--radius-xs</div>
+          <div class="radius-val">4px</div>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:8px;"></div>
+          <div class="radius-label">--radius-sm</div>
+          <div class="radius-val">8px</div>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:10px;"></div>
+          <div class="radius-label">--radius-md</div>
+          <div class="radius-val">10px</div>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:12px;"></div>
+          <div class="radius-label">--radius-lg</div>
+          <div class="radius-val">12px</div>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:16px;"></div>
+          <div class="radius-label">--radius-xl</div>
+          <div class="radius-val">16px</div>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:20px;"></div>
+          <div class="radius-label">--radius-2xl</div>
+          <div class="radius-val">20px</div>
+        </div>
+        <div class="radius-item">
+          <div class="radius-box" style="border-radius:9999px;"></div>
+          <div class="radius-label">--radius-full</div>
+          <div class="radius-val">9999px</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Shadows -->
+    <div class="spec-card">
+      <div class="spec-card-title">Shadow Levels</div>
+      <div class="shadow-grid">
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:none; border: 0.5px solid var(--separator);"></div>
+          <div class="shadow-label">shadow-0<br>none</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 1px 2px rgba(0,0,0,.12),0 1px 1px rgba(0,0,0,.08);"></div>
+          <div class="shadow-label">shadow-1<br>card</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 2px 8px rgba(0,0,0,.12),0 1px 3px rgba(0,0,0,.08);"></div>
+          <div class="shadow-label">shadow-2<br>hover</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 4px 16px rgba(0,0,0,.12),0 2px 6px rgba(0,0,0,.08);"></div>
+          <div class="shadow-label">shadow-3<br>popover</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 8px 32px rgba(0,0,0,.16),0 4px 12px rgba(0,0,0,.08);"></div>
+          <div class="shadow-label">shadow-4<br>modal</div>
+        </div>
+        <div class="shadow-item">
+          <div class="shadow-box" style="box-shadow:0 16px 48px rgba(0,0,0,.20),0 8px 16px rgba(0,0,0,.10);"></div>
+          <div class="shadow-label">shadow-5<br>dialog</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Frosted Glass -->
+    <div class="spec-card" style="background: linear-gradient(135deg, #667eea22, #764ba222); border: 0.5px solid rgba(255,255,255,0.6);">
+      <div class="spec-card-title">Frosted Glass Material</div>
+      <div style="background:rgba(255,255,255,0.72); backdrop-filter:blur(20px) saturate(180%); border-radius:var(--radius-md); padding:14px; border: 0.5px solid rgba(255,255,255,0.8); box-shadow:var(--shadow-2); margin-bottom:10px;">
+        <div style="font-size:15px; font-weight:600; color:var(--label);">Navigation Bar</div>
+        <div style="font-size:12px; color:var(--secondary-label); font-family:var(--font-mono); margin-top:4px;">rgba(255,255,255,0.72) + blur(20px)</div>
+      </div>
+      <div style="background:rgba(28,28,30,0.72); backdrop-filter:blur(20px) saturate(180%); border-radius:var(--radius-md); padding:14px; border: 0.5px solid rgba(255,255,255,0.1);">
+        <div style="font-size:15px; font-weight:600; color:#FFF;">Dark Material</div>
+        <div style="font-size:12px; color:rgba(255,255,255,0.5); font-family:var(--font-mono); margin-top:4px;">rgba(28,28,30,0.72) + blur(20px)</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     4. COMPONENTS — BUTTONS
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">04 — Buttons</div>
+  <div class="spec-card">
+    <div class="spec-card-title">Button Variants</div>
+    <div class="btn-showcase">
+      <button class="btn btn-primary">+ Action</button>
+      <button class="btn btn-secondary">+ Action</button>
+      <button class="btn btn-tertiary">Action</button>
+      <button class="btn btn-ghost">Action</button>
+      <button class="btn btn-danger">Delete</button>
+      <button class="btn btn-disabled" disabled>Disabled</button>
+    </div>
+    <div style="margin-top:16px;">
+      <table class="token-table">
+        <thead><tr><th>Variant</th><th>Height</th><th>Radius</th><th>Font</th><th>State: disabled</th></tr></thead>
+        <tbody>
+          <tr><td>Primary</td><td class="token-val">50px</td><td class="token-val">--radius-full</td><td class="token-val">17px / 600</td><td class="token-val">opacity: 38%</td></tr>
+          <tr><td>Secondary</td><td class="token-val">34px</td><td class="token-val">--radius-full</td><td class="token-val">15px / 600</td><td class="token-val">opacity: 38%</td></tr>
+          <tr><td>Tertiary</td><td class="token-val">34px</td><td class="token-val">--radius-full</td><td class="token-val">15px / 600</td><td class="token-val">opacity: 38%</td></tr>
+          <tr><td>Ghost</td><td class="token-val">34px</td><td class="token-val">--radius-full</td><td class="token-val">15px / 400</td><td class="token-val">opacity: 38%</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     5. FORM CONTROLS
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">05 — Form Controls</div>
+  <div class="spec-grid">
+
+    <!-- Text Inputs -->
+    <div class="spec-card">
+      <div class="spec-card-title">Text Fields</div>
+      <div class="input-showcase">
+        <input class="input-field" type="text" placeholder="Default input" />
+        <input class="input-field" type="text" value="Filled input" />
+        <input class="input-field error" type="text" value="Error state" />
+        <div class="search-field-wrap">
+          <span class="search-icon">⌕</span>
+          <input class="search-field" type="text" placeholder="Search..." />
+          <button class="search-clear">×</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="spec-row"><span class="spec-label">Height</span><span class="spec-value">44px</span></div>
+        <div class="spec-row"><span class="spec-label">Radius</span><span class="spec-value">--radius-md (10px)</span></div>
+        <div class="spec-row"><span class="spec-label">Border default</span><span class="spec-value">1px solid #C7C7CC</span></div>
+        <div class="spec-row"><span class="spec-label">Border focus</span><span class="spec-value">2px solid #0071E3</span></div>
+        <div class="spec-row"><span class="spec-label">Font</span><span class="spec-value">17px / 400</span></div>
+      </div>
+    </div>
+
+    <!-- Toggle + Checkbox -->
+    <div class="spec-card">
+      <div class="spec-card-title">Toggle &amp; Checkbox</div>
+      <div class="toggle-showcase" style="margin-bottom:20px;">
+        <div class="toggle-row">
+          <span class="toggle-label-text">Notifications</span>
+          <label class="toggle">
+            <input type="checkbox" checked>
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+        <div class="toggle-row">
+          <span class="toggle-label-text">Dark Mode</span>
+          <label class="toggle">
+            <input type="checkbox">
+            <div class="toggle-track"></div>
+            <div class="toggle-thumb"></div>
+          </label>
+        </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div class="checkbox-row">
+          <div class="checkbox-box checked"><span class="checkbox-check">✓</span></div>
+          <span class="checkbox-text">Checked item</span>
+        </div>
+        <div class="checkbox-row">
+          <div class="checkbox-box"></div>
+          <span class="checkbox-text">Unchecked item</span>
+        </div>
+        <div class="checkbox-row" style="opacity:0.38;">
+          <div class="checkbox-box checked"><span class="checkbox-check">✓</span></div>
+          <span class="checkbox-text">Disabled checked</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="spec-row"><span class="spec-label">Toggle size</span><span class="spec-value">51 × 31px</span></div>
+        <div class="spec-row"><span class="spec-label">On color</span><span class="spec-value">#34C759</span></div>
+        <div class="spec-row"><span class="spec-label">Off color</span><span class="spec-value">#C7C7CC</span></div>
+        <div class="spec-row"><span class="spec-label">Checkbox radius</span><span class="spec-value">--radius-xs (4px)</span></div>
+      </div>
+    </div>
+
+    <!-- Segmented Control -->
+    <div class="spec-card">
+      <div class="spec-card-title">Segmented Control</div>
+      <div style="margin-bottom:16px;">
+        <div class="segmented">
+          <button class="seg-btn active">All</button>
+          <button class="seg-btn">Active</button>
+          <button class="seg-btn">Archived</button>
+        </div>
+      </div>
+      <div style="margin-bottom:16px;">
+        <div class="segmented">
+          <button class="seg-btn active">Day</button>
+          <button class="seg-btn">Week</button>
+          <button class="seg-btn">Month</button>
+          <button class="seg-btn">Year</button>
+        </div>
+      </div>
+      <div class="spec-row"><span class="spec-label">Height</span><span class="spec-value">32px</span></div>
+      <div class="spec-row"><span class="spec-label">Track bg</span><span class="spec-value">rgba(118,118,128,.12)</span></div>
+      <div class="spec-row"><span class="spec-label">Selected bg</span><span class="spec-value">#FFFFFF + shadow-1</span></div>
+      <div class="spec-row"><span class="spec-label">Radius</span><span class="spec-value">--radius-sm (8px)</span></div>
+      <div class="spec-row"><span class="spec-label">Font</span><span class="spec-value">13px / 600</span></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     6. FEEDBACK — ALERTS + BADGES
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">06 — Feedback · Alerts · Badges</div>
+  <div class="spec-grid">
+
+    <div class="spec-card" style="grid-column: span 2;">
+      <div class="spec-card-title">Alert Banners</div>
+      <div class="alert-showcase">
+        <div class="alert alert-info">
+          <div class="alert-icon">ℹ</div>
+          <div><div class="alert-title">Alert Title</div><div class="alert-body">This is the alert description to show some information.</div></div>
+        </div>
+        <div class="alert alert-success">
+          <div class="alert-icon">✓</div>
+          <div><div class="alert-title">Alert Title</div><div class="alert-body">This is the alert description to show some information.</div></div>
+        </div>
+        <div class="alert alert-warning">
+          <div class="alert-icon">⚠</div>
+          <div><div class="alert-title">Alert Title</div><div class="alert-body">This is the alert description to show some information.</div></div>
+        </div>
+        <div class="alert alert-error">
+          <div class="alert-icon">✕</div>
+          <div><div class="alert-title">Alert Title</div><div class="alert-body">This is the alert description to show some information.</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-card-title">Badges &amp; Tags</div>
+      <div class="badge-showcase">
+        <span class="badge badge-blue">Badge</span>
+        <span class="badge badge-green">Active</span>
+        <span class="badge badge-red">Error</span>
+        <span class="badge badge-orange">Warning</span>
+        <span class="badge badge-gray">Archived</span>
+        <span class="badge badge-outline">Draft</span>
+        <span class="badge badge-blue badge-dot"></span>
+        <span class="badge badge-green badge-dot"></span>
+        <span class="badge badge-red badge-dot"></span>
+      </div>
+      <div style="margin-top:14px;">
+        <div class="spec-row"><span class="spec-label">Padding</span><span class="spec-value">3px 8px</span></div>
+        <div class="spec-row"><span class="spec-label">Radius</span><span class="spec-value">--radius-full</span></div>
+        <div class="spec-row"><span class="spec-label">Font</span><span class="spec-value">12px / 700</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     7. LAYOUT — CARDS + LIST + MODAL
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">07 — Layout · Cards · Lists · Modals</div>
+  <div class="spec-grid">
+
+    <!-- Cards -->
+    <div class="spec-card" style="background:var(--bg-secondary); padding:0; overflow:visible; box-shadow:none;">
+      <div style="padding:16px 0 10px;">
+        <div class="spec-card-title" style="padding:0 16px;">Stat Cards</div>
+      </div>
+      <div style="padding:0 16px 16px; display:grid; grid-template-columns:1fr 1fr; gap:12px;">
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Revenue</div>
+              <div class="card-subtitle">This month</div>
+            </div>
+            <span class="badge badge-green">↑</span>
+          </div>
+          <div class="card-stat">$48.2K</div>
+          <div class="card-trend trend-up">↑ 12.5% vs last month</div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div>
+              <div class="card-title">Users</div>
+              <div class="card-subtitle">Active now</div>
+            </div>
+            <span class="badge badge-blue">●</span>
+          </div>
+          <div class="card-stat">1,284</div>
+          <div class="card-trend trend-down">↓ 3.2% vs yesterday</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- List -->
+    <div class="spec-card" style="padding:0; overflow:hidden;">
+      <div class="list-header">List Title</div>
+      <div class="list-item selected">
+        <div class="list-item-left">
+          <span class="list-check">✓</span>
+          <span class="list-item-text">List Item</span>
+        </div>
+        <div class="list-item-right">
+          <span class="list-kbd">⇧⌘A</span>
+          <span class="list-chevron">›</span>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-item-left">
+          <span class="list-check" style="visibility:hidden;">✓</span>
+          <span class="list-item-text">List Item</span>
+        </div>
+        <div class="list-item-right">
+          <span class="list-kbd">⇧⌘A</span>
+          <span class="list-chevron">›</span>
+        </div>
+      </div>
+      <div class="list-item">
+        <div class="list-item-left">
+          <span class="list-check" style="visibility:hidden;">✓</span>
+          <span class="list-item-text">List Item</span>
+        </div>
+        <div class="list-item-right">
+          <span class="list-chevron">›</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="spec-card" style="background:rgba(0,0,0,0.08);">
+      <div class="spec-card-title">Modal / Dialog</div>
+      <div class="modal-preview">
+        <div class="modal-title">Modal Title</div>
+        <div class="modal-subtitle">Modal Subtitle</div>
+        <div class="modal-content">Content Area</div>
+        <div class="modal-actions">
+          <button class="btn btn-primary">+ Action</button>
+          <button class="btn btn-secondary">+ Action</button>
+        </div>
+      </div>
+      <div style="margin-top:12px;">
+        <div class="spec-row"><span class="spec-label">Max width</span><span class="spec-value">560px</span></div>
+        <div class="spec-row"><span class="spec-label">Radius</span><span class="spec-value">--radius-xl (16px)</span></div>
+        <div class="spec-row"><span class="spec-label">Shadow</span><span class="spec-value">--shadow-4</span></div>
+        <div class="spec-row"><span class="spec-label">Backdrop</span><span class="spec-value">rgba(0,0,0,0.40)</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     8. NAVIGATION
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">08 — Navigation</div>
+  <div class="spec-grid">
+
+    <div class="spec-card" style="grid-column: span 2;">
+      <div class="spec-card-title">Navigation Bar</div>
+      <div class="navbar-preview" style="margin-bottom:12px;">
+        <div class="navbar-left">
+          <span class="navbar-back">‹ Back</span>
+          <span class="navbar-title">Page Title</span>
+        </div>
+        <div class="navbar-right">
+          <button class="navbar-action">Edit</button>
+          <button class="navbar-action">+ Add</button>
+        </div>
+      </div>
+      <div class="spec-row"><span class="spec-label">Height</span><span class="spec-value">44px</span></div>
+      <div class="spec-row"><span class="spec-label">Background</span><span class="spec-value">rgba(255,255,255,0.72) + blur(20px)</span></div>
+      <div class="spec-row"><span class="spec-label">Title font</span><span class="spec-value">17px / 600</span></div>
+      <div class="spec-row"><span class="spec-label">Action color</span><span class="spec-value">--color-action #0071E3</span></div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-card-title">Breadcrumb</div>
+      <div style="margin-bottom:12px;">
+        <div class="breadcrumb">
+          <span class="breadcrumb-item">Home</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-item">Settings</span>
+          <span class="breadcrumb-sep">›</span>
+          <span class="breadcrumb-item active">Profile</span>
+        </div>
+      </div>
+      <div class="spec-row"><span class="spec-label">Font</span><span class="spec-value">13px / 400</span></div>
+      <div class="spec-row"><span class="spec-label">Active color</span><span class="spec-value">--label #1D1D1F</span></div>
+      <div class="spec-row"><span class="spec-label">Inactive color</span><span class="spec-value">--secondary-label</span></div>
+      <div class="spec-row"><span class="spec-label">Separator</span><span class="spec-value">› --gray-2</span></div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-card-title">Avatars</div>
+      <div class="avatar-showcase" style="margin-bottom:16px;">
+        <div class="avatar avatar-sm">S</div>
+        <div class="avatar avatar-md">PJ</div>
+        <div class="avatar avatar-lg">AB</div>
+        <div class="avatar avatar-xl">JD</div>
+        <div class="avatar avatar-lg avatar-gray">?</div>
+      </div>
+      <div class="avatar-group" style="margin-bottom:16px;">
+        <div class="avatar avatar-md" style="background:#007AFF;">A</div>
+        <div class="avatar avatar-md" style="background:#34C759;">B</div>
+        <div class="avatar avatar-md" style="background:#FF9500;">C</div>
+        <div class="avatar avatar-md" style="background:#AF52DE;">D</div>
+        <div class="avatar avatar-md avatar-gray">+3</div>
+      </div>
+      <div class="spec-row"><span class="spec-label">SM</span><span class="spec-value">28×28px / 11px</span></div>
+      <div class="spec-row"><span class="spec-label">MD</span><span class="spec-value">36×36px / 14px</span></div>
+      <div class="spec-row"><span class="spec-label">LG</span><span class="spec-value">48×48px / 18px</span></div>
+      <div class="spec-row"><span class="spec-label">XL</span><span class="spec-value">64×64px / 24px</span></div>
+      <div class="spec-row"><span class="spec-label">Group overlap</span><span class="spec-value">-8px + 2px border</span></div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     9. ANIMATION
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">09 — Animation &amp; Motion</div>
+  <div class="spec-grid">
+
+    <div class="spec-card">
+      <div class="spec-card-title">Duration Tokens</div>
+      <div class="spec-row"><span class="spec-label">--duration-fast</span><span class="spec-value">150ms — hover, micro</span></div>
+      <div class="spec-row"><span class="spec-label">--duration-standard</span><span class="spec-value">250ms — most transitions</span></div>
+      <div class="spec-row"><span class="spec-label">--duration-medium</span><span class="spec-value">350ms — modal appear</span></div>
+      <div class="spec-row"><span class="spec-label">--duration-slow</span><span class="spec-value">500ms — complex layout</span></div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-card-title">Easing Curves</div>
+      <div class="spec-row"><span class="spec-label">--ease-default</span><span class="spec-value">cubic-bezier(.42,0,.58,1)</span></div>
+      <div class="spec-row"><span class="spec-label">--ease-enter</span><span class="spec-value">cubic-bezier(0,0,.2,1)</span></div>
+      <div class="spec-row"><span class="spec-label">--ease-exit</span><span class="spec-value">cubic-bezier(.4,0,1,1)</span></div>
+      <div class="spec-row"><span class="spec-label">--ease-spring</span><span class="spec-value">cubic-bezier(.175,.885,.32,1.275)</span></div>
+    </div>
+
+    <div class="spec-card">
+      <div class="spec-card-title">Motion Demo (hover over boxes)</div>
+      <div class="motion-demo">
+        <div class="motion-box motion-standard" style="background:var(--color-action);">Standard<br>250ms</div>
+        <div class="motion-box motion-spring" style="background:var(--color-green);">Spring<br>350ms</div>
+        <div class="motion-box motion-enter" style="background:var(--color-purple);">Enter<br>350ms</div>
+        <div class="motion-box" style="background:var(--color-orange); transition:transform 150ms cubic-bezier(.42,0,.58,1);">Fast<br>150ms</div>
+      </div>
+      <div style="margin-top:12px;font-size:12px;color:var(--secondary-label);">* Only use transform &amp; opacity for GPU-accelerated animations.<br>* Always include prefers-reduced-motion override.</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════
+     10. RESPONSIVE BREAKPOINTS
+     ══════════════════════════════════════ -->
+<div class="section">
+  <div class="section-title">10 — Responsive Breakpoints</div>
+  <div class="spec-card">
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+      <div style="flex:1; min-width:200px; background:var(--bg-secondary); border-radius:var(--radius-md); padding:16px; border-left:3px solid var(--color-action);">
+        <div style="font-size:15px;font-weight:600;">Mobile</div>
+        <div style="font-size:22px;font-weight:700;margin:8px 0;">≤ 735px</div>
+        <div style="font-size:13px;color:var(--secondary-label);">Single column<br>Sidebar hidden<br>Edge margin: 16px</div>
+      </div>
+      <div style="flex:1; min-width:200px; background:var(--bg-secondary); border-radius:var(--radius-md); padding:16px; border-left:3px solid var(--color-orange);">
+        <div style="font-size:15px;font-weight:600;">Tablet</div>
+        <div style="font-size:22px;font-weight:700;margin:8px 0;">≤ 1068px</div>
+        <div style="font-size:13px;color:var(--secondary-label);">Two column<br>Sidebar collapsed<br>Edge margin: 20px</div>
+      </div>
+      <div style="flex:1; min-width:200px; background:var(--bg-secondary); border-radius:var(--radius-md); padding:16px; border-left:3px solid var(--color-green);">
+        <div style="font-size:15px;font-weight:600;">Desktop</div>
+        <div style="font-size:22px;font-weight:700;margin:8px 0;">> 1068px</div>
+        <div style="font-size:13px;color:var(--secondary-label);">Full layout<br>Sidebar visible<br>Edge margin: 24px</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Footer -->
+<div style="text-align:center; padding:32px 0 16px; color:var(--tertiary-label); font-size:12px; border-top:0.5px solid var(--opaque-separator); margin-top:32px;">
+  Shark-Style Web Admin Design System · v1.0 · Generated 2026 · /ui-spec
+</div>
+
+</body>
+</html>
