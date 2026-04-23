@@ -8,7 +8,11 @@ Type `/ui-spec` for web admin dashboards, or `/mobile-spec` for mobile app scree
 
 ## Preview
 
-Open [`preview.html`](./preview.html) in a browser to see the full visual specification:
+[![Live Preview](https://img.shields.io/badge/Live%20Preview-Open-0071E3?style=flat-square&logo=github)](https://sharkpepper0729.github.io/shark-style-skill/preview.html)
+
+> 直接在浏览器中查看完整视觉规范：**https://sharkpepper0729.github.io/shark-style-skill/preview.html**
+
+Open [`preview.html`](./preview.html) locally, or visit the live link above to see the full visual specification:
 
 - Color system (system colors, grays, semantic colors)
 - Typography scale (11 levels, SF Pro / -apple-system)
