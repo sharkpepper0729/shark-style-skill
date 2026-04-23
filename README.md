@@ -1,8 +1,8 @@
-# ui-spec — Shark-Style Web Admin Design System for Claude Code
+# ui-spec — Shark-Style Unified Design System for Claude Code
 
-A [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that injects a complete Shark Design Language-based design system into every UI code generation session.
+A [Claude Code skill](https://docs.anthropic.com/en/docs/claude-code/skills) that injects a complete Shark Design Language into every UI code generation session — covering both **Web Admin** (desktop) and **Mobile C-End** (iOS-style phone preview).
 
-Type `/ui-spec` and Claude instantly knows every color token, type scale, spacing rule, component spec, and animation timing — and applies them to whatever code it writes.
+Type `/ui-spec` for web admin dashboards, or `/mobile-spec` for mobile app screens. Claude instantly knows every color token, type scale, spacing rule, component spec, and animation timing — and applies them precisely to whatever code it writes.
 
 ---
 
@@ -13,24 +13,53 @@ Open [`preview.html`](./preview.html) in a browser to see the full visual specif
 - Color system (system colors, grays, semantic colors)
 - Typography scale (11 levels, SF Pro / -apple-system)
 - Spacing, border radius, shadow levels
-- Components: Buttons, Inputs, Toggle, Checkbox, Segmented Control, Alert, Badge, Card, Modal, List, Navbar, Breadcrumb, Avatar
+- Web components: Buttons, Inputs, Toggle, Segmented Control, Alert, Badge, Card, Modal, List, Navbar, Breadcrumb, Search
+- Mobile components: Device shell, Status bar, Dynamic Island, Tab Bar, Product Card, Carousel, FAB
 
 ---
 
 ## What's inside
 
-The skill provides exact values for:
+### Shared Design Tokens (Web & Mobile)
 
 | Category | Tokens |
 |----------|--------|
-| **Colors** | 9 system colors + 6 grays + semantic text/bg/fill/separator |
-| **Typography** | 11-level type scale, font stacks, weight rules |
+| **Colors** | 9 system colors + 6 grays + semantic text / bg / fill / separator |
+| **Typography** | 11-level type scale, SF Pro font stack, weight rules |
 | **Spacing** | 8px-grid scale (4px → 80px) |
 | **Border Radius** | 7 levels (4px → full capsule) |
-| **Shadows** | 6 elevation levels + frosted glass material |
-| **Components** | Button, Input, Toggle, Card, Modal, Alert, Badge, List, Navbar, Segmented Control, Search, Breadcrumb, Avatar |
+| **Shadows** | 5 elevation levels + frosted glass material |
 | **Animation** | 4 duration tokens + 4 easing curves + motion rules |
-| **Responsive** | 3 breakpoints (735 / 1068px) |
+
+### Web Admin (`/ui-spec`)
+
+| Category | Details |
+|----------|---------|
+| **Layout** | 3 breakpoints (735 / 1068px), sidebar, navbar |
+| **Components** | Button, Input, Toggle, Card, Modal, Alert, Badge, List, Navbar, Segmented Control, Search, Breadcrumb |
+
+### Mobile C-End (`/mobile-spec`)
+
+| Category | Details |
+|----------|---------|
+| **Device Shell** | 430×932px, border-radius 55px, overflow hidden |
+| **System UI** | Status bar (54px), Dynamic Island, Home Indicator |
+| **Safe Zones** | padding-top: 54px / padding-bottom: 34px |
+| **Components** | Tab Bar, Product Card, Carousel, FAB, Full-width Button, Section Header |
+
+---
+
+## Platform boundary
+
+| Dimension | Web Admin `/ui-spec` | Mobile C-End `/mobile-spec` |
+|-----------|---------------------|----------------------------|
+| Container | Responsive, ≥ 1068px full layout | Fixed 430×932px device shell |
+| System UI | None | Status bar + Dynamic Island + Home Bar |
+| Safe area | Not required | padding-top: 54px / bottom: 34px |
+| Scroll | Page-level | Content area, hidden scrollbar |
+| Extra components | Sidebar, Breadcrumb, Data table | Tab Bar, Carousel, FAB, Product card |
+
+**Never mix web layout rules into the mobile container, or mobile safe-area rules into web layout.**
 
 ---
 
@@ -48,9 +77,9 @@ Then add the trigger to your `~/.claude/CLAUDE.md`:
 
 ```markdown
 # ui-spec
-- **ui-spec** (`~/.claude/skills/ui-spec/SKILL.md`) - Shark-Style web admin UI design system. Trigger: `/ui-spec`
-When the user types `/ui-spec`, invoke the Skill tool with `skill: "ui-spec"` before doing anything else.
-Always apply this design system when writing any UI code for the user's web admin project.
+- **ui-spec** (`~/.claude/skills/ui-spec/SKILL.md`) - Shark-Style unified design system (Web Admin + Mobile C-End). Trigger: `/ui-spec`, `/mobile-spec`
+When the user types `/ui-spec` or `/mobile-spec`, invoke the Skill tool with `skill: "ui-spec"` before doing anything else.
+Always apply this design system when writing any UI code for the user's web admin or mobile project.
 ```
 
 ### Option B — Manual
@@ -62,25 +91,27 @@ Always apply this design system when writing any UI code for the user's web admi
 
 ## Usage
 
+**Web Admin:**
 ```
 /ui-spec build a user management table with search and filters
-```
-
-```
 /ui-spec create a stats dashboard with 4 metric cards
-```
-
-```
 /ui-spec write a login modal with email + password fields
 ```
 
-Claude will output complete, working code (HTML/CSS, React, Vue — whatever you're using) that precisely follows the design system, including all interactive states and responsive behavior.
+**Mobile C-End:**
+```
+/mobile-spec design a product listing page with carousel and cards
+/mobile-spec create a checkout flow screen with bottom CTA
+/mobile-spec build an app home screen with tab bar navigation
+```
+
+Claude will output complete, working code (HTML/CSS, React, Vue — whatever you're using) that precisely follows the design system, including all interactive states, responsive behavior, and — for mobile — the full device shell with status bar, Dynamic Island, and home indicator.
 
 ---
 
 ## Design principles
 
-Shark-Style is a distilled design language for web admin products, inspired by the clarity and precision of modern system UI:
+Shark-Style is a unified design language for both web admin products and mobile C-end apps, inspired by the clarity and precision of modern system UI:
 
 1. **Clarity** — Legible text (min 4.5:1 contrast), purposeful icons, UI serves content
 2. **Deference** — Interface steps back; frosted glass lets content lead
@@ -89,7 +120,8 @@ Shark-Style is a distilled design language for web admin products, inspired by t
 Key decisions:
 - Primary action color: `#0071E3` (web-optimized blue)
 - Primary text: `#1D1D1F` (not pure `#000000`)
-- No dark mode (web admin context)
+- Mobile device shell: 430×932px iPhone Pro Max proportions
+- No dark mode (admin and C-end context)
 
 ---
 
@@ -110,10 +142,11 @@ Fork this repo and edit `SKILL.md` to override any token. Common customizations:
 ## Contributing
 
 PRs welcome for:
-- Additional component specs (data table, pagination, date picker, tooltip, dropdown)
+- Additional web components (data table, pagination, date picker, tooltip, dropdown)
+- Additional mobile patterns (onboarding, empty state, loading skeleton)
 - Dark mode variant
 - Tailwind config export
-- Framework-specific starter templates
+- Framework-specific starter templates (React, Vue, Next.js)
 
 ---
 
