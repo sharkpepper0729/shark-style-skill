@@ -1,9 +1,6 @@
 ---
 name: ui-spec
-description: >
-  Shark-Style unified design system covering both Web Admin (desktop) and Mobile C-end (iOS-style phone preview) UI.
-  ALWAYS use this skill when the user asks to build any frontend interface — web dashboards, admin panels, mobile pages, phone previews, C-end app screens, or any HTML/CSS/React UI.
-  Trigger on: /ui-spec (web), /mobile-spec (mobile), or any request mentioning "设计页面", "手机预览", "移动端", "admin UI", "dashboard", "C端", "app界面", "phone mockup".
+description: Shark-Style unified design system for Web Admin (desktop) and Mobile C-End (iOS-style phone preview) — colors, typography, spacing, components, animations as precise CSS tokens and implementation rules.
 trigger: /ui-spec, /mobile-spec
 ---
 
